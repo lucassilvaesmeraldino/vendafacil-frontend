@@ -32,4 +32,4 @@ mvnw
 mvnw.cmd
 target/
 vendafacil-frontend/
-.db
+*.db
