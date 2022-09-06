@@ -1,15 +1,15 @@
 package br.com.wmw.vendafacil_frontend.ui;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 import br.com.wmw.vendafacil_frontend.dao.ClienteDao;
 import br.com.wmw.vendafacil_frontend.domain.Cliente;
 import br.com.wmw.vendafacil_frontend.domain.Pedido;
 import br.com.wmw.vendafacil_frontend.util.Colors;
+import br.com.wmw.vendafacil_frontend.util.DateUtils;
 import br.com.wmw.vendafacil_frontend.util.Fonts;
 import br.com.wmw.vendafacil_frontend.util.Images;
 import br.com.wmw.vendafacil_frontend.util.MaterialConstants;
+import br.com.wmw.vendafacil_frontend.util.Messages;
+import totalcross.sys.Settings;
 import totalcross.ui.Button;
 import totalcross.ui.ComboBox;
 import totalcross.ui.Container;
@@ -58,8 +58,8 @@ public class CreatePedidoWindow extends Window {
 		this.pedido = pedido == null && !updating ? new Pedido() : pedido;
 		
 		if(pedido != null) {
-			editDataEntrega.setText(pedido.dataEntrega);
-			Cliente cliente = clienteDao.findByCodigo(pedido.codigoCliente);
+			editDataEntrega.setText(pedido.getDataEntrega());
+			Cliente cliente = clienteDao.findByCodigo(pedido.getCodigoCliente());
 			cbClientes.setSelectedItem(cliente);
 		}
 	}
@@ -67,11 +67,12 @@ public class CreatePedidoWindow extends Window {
 	@Override
 	protected void onPopup() {
 		String title = "Novo Pedido";
-		Image image = Images.iconeAdicionar;
+		Image image = Images.getIconeAdicionar();
 		int gap = 3;
+		
 		if(updating) {
 			title = "Alterar Pedido";
-			image = Images.iconeEditar;
+			image = Images.getIconeEditar();
 			gap = 0;
 		}
 
@@ -110,17 +111,13 @@ public class CreatePedidoWindow extends Window {
 
 	@Override
 	public <H extends EventHandler> void onEvent(final Event<H> event) {
-		switch (event.type) {
-			case ControlEvent.PRESSED:
-				if (event.target == this.btnProximo) {
-					nextScreen();
-				} else if (event.target == btnVoltar) {
-					InitialMenu initialMenu = new InitialMenu();
-					initialMenu.popup();
-				}
-				break;
-			default:
-				break;
+		if (event.type == ControlEvent.PRESSED) {
+			if (event.target == this.btnProximo) {
+				nextScreen();
+			} else if (event.target == btnVoltar) {
+				InitialMenu initialMenu = new InitialMenu();
+				initialMenu.popup();
+			}
 		}
 		super.onEvent(event);
 	}
@@ -134,8 +131,8 @@ public class CreatePedidoWindow extends Window {
 	}
 	
 	private void populatePedido(){
-		pedido.codigoCliente = clientesArray[cbClientes.getSelectedIndex()].codigo;
-		pedido.dataEntrega = editDataEntrega.getText();
+		pedido.setCodigoCliente(clientesArray[cbClientes.getSelectedIndex()].getCodigo());
+		pedido.setDataEntrega(editDataEntrega.getText());
 
 	}
 	
@@ -143,35 +140,34 @@ public class CreatePedidoWindow extends Window {
 		String dataEntregaWithMask = editDataEntrega.getText();
 		String dataEntregaWithoutMask = editDataEntrega.getTextWithoutMask();
 		if(cbClientes.getSelectedIndex() == -1) {
-			new MessageBox("Atenção!", "Selecione um cliente!").popup();
+			new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_CLIENTINCORRECT_EMPTY).popup();
 			return false;
 		}
 		if(dataEntregaWithMask.isEmpty()) {
-			new MessageBox("Atenção!", "Digite uma data de entrega!").popup();
+			new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DATEINCORRECT_EMPTY).popup();
 			return false;
 		}
 		if(dataEntregaWithoutMask.length() < 8) {
-			new MessageBox("Atenção!", "Digite uma data de entrega válida!").popup();
+			new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DATEINCORRECT_LENGTH).popup();
 			return false;
 		}
-		int dayDataEntrega = Integer.valueOf(dataEntregaWithoutMask.substring(0, 2));
+		int dayDataEntrega = Integer.parseInt(dataEntregaWithoutMask.substring(0, 2));
 		if(dayDataEntrega <= 0 || dayDataEntrega > 31) {
-			new MessageBox("Atenção!", "Data com dia irregular informado!").popup();
+			new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DATEINCORRECT_DAY).popup();
 			return false;
 		}
-		int monthDataEntrega = Integer.valueOf(dataEntregaWithoutMask.substring(2, 4));
+		int monthDataEntrega = Integer.parseInt(dataEntregaWithoutMask.substring(2, 4));
 		if(monthDataEntrega <= 0 || monthDataEntrega > 12) {
-			new MessageBox("Atenção!", "Data com mês irregular informado!").popup();
+			new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DATEINCORRECT_MONTH).popup();
 			return false;
 		}
-		int yearDataEntrega = Integer.valueOf(dataEntregaWithoutMask.substring(4));
+		int yearDataEntrega = Integer.parseInt(dataEntregaWithoutMask.substring(4));
 		if(yearDataEntrega <= 0) {
-			new MessageBox("Atenção!", "Data com ano irregular informado!").popup();
+			new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DATEINCORRECT_YEAR).popup();
 			return false;
 		}
-		LocalDate dataEntregaAsDate = LocalDate.parse(dataEntregaWithMask, DateTimeFormatter.ofPattern("d/MM/yyyy"));
-		if(dataEntregaAsDate.isBefore(LocalDate.now())) {
-			new MessageBox("Atenção!", "Data de entrega menor que a data atual!").popup();
+		if(!DateUtils.isPresentOrFutureDate(dataEntregaWithMask, Settings.DATE_DMY)) {
+			new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DATEINCORRECT_INVALID).popup();
 			return false;
 		}
 		return true;

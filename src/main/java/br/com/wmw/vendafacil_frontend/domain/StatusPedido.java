@@ -1,7 +1,7 @@
 package br.com.wmw.vendafacil_frontend.domain;
 
 public enum StatusPedido {
-	ABERTO, FECHADO, ENVIADO;
+	ABERTO, FECHADO, ENVIADO, REJEITADO;
 	
 	public static StatusPedido getByCodigo(int codigo) {
 		StatusPedido statusPedido = null;

@@ -15,19 +15,20 @@ import totalcross.net.UnknownHostException;
 import totalcross.sys.Vm;
 
 public class ClienteApi {
+	
+	private ClienteApi() {	
+	}
 
 	public static List<Cliente> getAllClientes() {
 		List<Cliente> clientesList = new ArrayList<>();
-		try {
+		try (ByteArrayStream bas = new ByteArrayStream(4096)){
             HttpStream.Options options = new HttpStream.Options();
             options.httpType = HttpStream.GET;
             options.setContentType("application/json");
             
             HttpStream httpStream = new HttpStream(new URI("http://localhost:8080/clientes"), options);
-            ByteArrayStream bas = new ByteArrayStream(4096);
             bas.readFully(httpStream, 10, 2048);
             String data = new String(bas.getBuffer(), 0, bas.available());
-            bas.close();
             
             if(httpStream.responseCode == 200) clientesList = (JSONFactory.asList(data, Cliente.class));
             

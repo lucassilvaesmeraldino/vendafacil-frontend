@@ -20,9 +20,9 @@ public class ProdutoDao {
 			final PreparedStatement pst = DatabaseManager.getConnection().prepareStatement("INSERT OR IGNORE INTO TB_PRODUTO (CD_PRODUTO, NM_PRODUTO, PRECO) VALUES (?, ?, ?)");
 			for(Produto produto : produtos) {
 				pst.clearParameters();
-				pst.setLong(1, produto.codigo);
-				pst.setString(2, produto.nome);
-				pst.setDouble(3, produto.preco);
+				pst.setLong(1, produto.getCodigo());
+				pst.setString(2, produto.getNome());
+				pst.setDouble(3, produto.getPreco());
 				int inserted = pst.executeUpdate();
 				if(inserted <= 0) success = false;
 			}
@@ -34,14 +34,12 @@ public class ProdutoDao {
 
 	public List<Produto> findAll() {
 		final List<Produto> produtos = new ArrayList<>();
-		try {
-			final Statement st = DatabaseManager.getConnection().createStatement();
+		try(Statement st = DatabaseManager.getConnection().createStatement()) {
 			final ResultSet rs = st.executeQuery("SELECT CD_PRODUTO, NM_PRODUTO, PRECO FROM TB_PRODUTO");
 			while (rs.next()) {
 				produtos.add(new Produto(rs.getLong("CD_PRODUTO"), rs.getString("NM_PRODUTO"), rs.getDouble("PRECO")));
 			}
 			rs.close();
-			st.close();
 		} catch (final SQLException e) {
 			Vm.debug(e.getMessage());
 		}
@@ -55,9 +53,9 @@ public class ProdutoDao {
 			pst.setLong(1, codigo);
 			ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
-				produto.codigo = rs.getLong("CD_PRODUTO");
-				produto.nome = rs.getString("NM_PRODUTO");
-				produto.preco = rs.getDouble("PRECO");
+				produto.setCodigo(rs.getLong("CD_PRODUTO"));
+				produto.setNome(rs.getString("NM_PRODUTO"));
+				produto.setPreco(rs.getDouble("PRECO"));
 			}
 			pst.close();
 			rs.close();
@@ -68,8 +66,7 @@ public class ProdutoDao {
 	}
 
 	public void removeAll() {
-		try {
-			final Statement st = DatabaseManager.getConnection().createStatement();
+		try(Statement st = DatabaseManager.getConnection().createStatement()){
 			st.execute("DELETE FROM TB_PRODUTO");
 		} catch (final SQLException e) {
 			Vm.debug(e.getMessage());

@@ -18,6 +18,9 @@ import totalcross.sys.Vm;
 public class DatabaseManager {
 
 	private static SQLiteUtil sqlLiteUtil;
+	
+	private DatabaseManager() {
+	}
 
 	static {
 		try {
@@ -32,20 +35,18 @@ public class DatabaseManager {
 	}
 
 	public static void loadTables() {
-		try {
-			final Statement st = DatabaseManager.sqlLiteUtil.con().createStatement();
+		try(Statement st = DatabaseManager.sqlLiteUtil.con().createStatement()) {
 			st.execute("CREATE TABLE IF NOT EXISTS TB_CLIENTE (CD_CLIENTE bigint, NM_CLIENTE varchar(255), primary key(CD_CLIENTE))");
 			st.execute("CREATE TABLE IF NOT EXISTS TB_PRODUTO (CD_PRODUTO bigint, NM_PRODUTO varchar(255), PRECO decimal, "
 					+ "primary key(CD_PRODUTO))");
 			st.execute("CREATE TABLE IF NOT EXISTS TB_PEDIDO "
-					+ "(CD_PEDIDO integer primary key autoincrement, DATA_EMISSAO varchar(255), DATA_FINALIZACAO varchar(255), "
+					+ "(CD_PEDIDO integer primary key autoincrement, DATA_EMISSAO varchar(255), "
 					+ "DATA_ENTREGA varchar(255), TOTAL_PEDIDO decimal(19,0), CD_CLIENTE bigint, CD_STATUSPEDIDO bigint,"
 					+ "FOREIGN KEY(CD_CLIENTE) REFERENCES TB_CLIENTE(CD_CLIENTE))");
 			st.execute("CREATE TABLE IF NOT EXISTS TB_ITEMPEDIDO (CD_ITEM integer primary key autoincrement, NM_SEQUENCIA bigint, "
 					+ "QUANTIDADE integer, PRECO_UNITARIO decimal, DSC_PORCENTO decimal, DSC_VALOR decimal, TOTAL decimal,"
 					+ "CD_PRODUTO bigint, CD_PEDIDO bigint, FOREIGN KEY(CD_PRODUTO) REFERENCES TB_PRODUTO(CD_PRODUTO), "
 					+ "FOREIGN KEY(CD_PEDIDO) REFERENCES TB_PEDIDO(CD_PEDIDO))");
-			st.close();
 		} catch (SQLException e) {
 			Vm.debug(e.getMessage());
 		}

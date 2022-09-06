@@ -4,6 +4,9 @@ import totalcross.ui.Control;
 import totalcross.util.UnitsConverter;
 
 public class MaterialConstants {
+	
+	private MaterialConstants() {
+	}
 
 	public static final int BORDER_SPACING = UnitsConverter.toPixels(16 + Control.DP);
 

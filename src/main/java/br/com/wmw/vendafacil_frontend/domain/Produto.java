@@ -2,9 +2,9 @@ package br.com.wmw.vendafacil_frontend.domain;
 
 public class Produto {
 
-	public long codigo;
-	public String nome;
-	public double preco;
+	private long codigo;
+	private String nome;
+	private double preco;
 	
 	public Produto(long codigo, String nome, double preco) {
 		this.codigo = codigo;

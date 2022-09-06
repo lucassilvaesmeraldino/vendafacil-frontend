@@ -31,7 +31,7 @@ public class InitialMenu extends Window {
 
 	@Override
 	public void onPopup() {
-		ImageControl headLogo = new ImageControl(Images.logoWMW);
+		ImageControl headLogo = new ImageControl(Images.getLogoWMW());
 		headLogo.scaleToFit = true;
 		add(headLogo, LEFT + MaterialConstants.BORDER_SPACING, TOP,
 				PARENTSIZE + 50, PARENTSIZE + 50);
@@ -53,8 +53,7 @@ public class InitialMenu extends Window {
 
 	@Override
 	public <H extends EventHandler> void onEvent(final Event<H> event) {
-		switch (event.type) {
-		case ControlEvent.PRESSED:
+		if (event.type == ControlEvent.PRESSED) {
 			if (event.target == this.btnPedidoList) {
 				final ListPedidosWindow listPedidosWindow = new ListPedidosWindow();
 				listPedidosWindow.popup();
@@ -62,9 +61,6 @@ public class InitialMenu extends Window {
 				final CreatePedidoWindow createPedidoWindow = new CreatePedidoWindow(null, false);
 				createPedidoWindow.popup();
 			}
-			break;
-		default:
-			break;
 		}
 		super.onEvent(event);
 

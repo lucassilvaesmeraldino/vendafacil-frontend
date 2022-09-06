@@ -1,11 +1,13 @@
 package br.com.wmw.vendafacil_frontend.domain;
 
+import java.util.Objects;
+
 public class Cliente {
 
-	public long codigo;
-	public String nome;
+	private long codigo;
+	private String nome;
 	
-	public Cliente(long codigo, String nome) {
+	public Cliente(final long codigo, final String nome) {
 		this.codigo = codigo;
 		this.nome = nome;
 	}
@@ -15,11 +17,16 @@ public class Cliente {
 	
 	@Override
 	public String toString() {
-		return String.format("%s", nome);
+		return nome;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public int hashCode() {
+		return Objects.hash(codigo, nome);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -27,14 +34,14 @@ public class Cliente {
 		if (getClass() != obj.getClass())
 			return false;
 		Cliente other = (Cliente) obj;
-		return codigo == other.codigo;
+		return codigo == other.codigo && Objects.equals(nome, other.nome);
 	}
 
 	public long getCodigo() {
 		return codigo;
 	}
 
-	public void setCodigo(long codigo) {
+	public void setCodigo(final long codigo) {
 		this.codigo = codigo;
 	}
 
@@ -42,7 +49,7 @@ public class Cliente {
 		return nome;
 	}
 
-	public void setNome(String nome) {
+	public void setNome(final String nome) {
 		this.nome = nome;
 	}
 }

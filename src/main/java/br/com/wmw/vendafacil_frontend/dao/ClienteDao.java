@@ -20,8 +20,8 @@ public class ClienteDao {
 			final PreparedStatement pst = DatabaseManager.getConnection().prepareStatement("INSERT OR IGNORE INTO TB_CLIENTE (CD_CLIENTE, NM_CLIENTE) VALUES (?, ?)");
 			for(Cliente cliente : clientes) {
 				pst.clearParameters();
-				pst.setLong(1, cliente.codigo);
-				pst.setString(2, cliente.nome);	
+				pst.setLong(1, cliente.getCodigo());
+				pst.setString(2, cliente.getNome());	
 				int inserted = pst.executeUpdate();
 				if(inserted <= 0) success = false;
 			}
@@ -33,14 +33,12 @@ public class ClienteDao {
 
 	public Cliente[] findAllOnFormatArray() {
 		final List<Cliente> clientesList = new ArrayList<>();
-		try {
-			final Statement st = DatabaseManager.getConnection().createStatement();
+		try (Statement st = DatabaseManager.getConnection().createStatement()){
 			final ResultSet rs = st.executeQuery("SELECT CD_CLIENTE, NM_CLIENTE FROM TB_CLIENTE");
 			while(rs.next()) {
 				clientesList.add(new Cliente(rs.getLong("CD_CLIENTE"), rs.getString("NM_CLIENTE")));
 			}
 			rs.close();
-			st.close();
 		} catch (final SQLException e) {
 			Vm.debug(e.getMessage());
 		}
@@ -58,8 +56,8 @@ public class ClienteDao {
 			pst.setLong(1, codigo);
 			ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
-				cliente.codigo = rs.getLong("CD_CLIENTE");
-				cliente.nome = rs.getString("NM_CLIENTE");
+				cliente.setCodigo(rs.getLong("CD_CLIENTE"));
+				cliente.setNome(rs.getString("NM_CLIENTE"));
 			}
 			pst.close();
 			rs.close();
@@ -70,8 +68,7 @@ public class ClienteDao {
 	}
 	
 	public void removeAll() {
-		try {
-			final Statement st = DatabaseManager.getConnection().createStatement();
+		try (Statement st = DatabaseManager.getConnection().createStatement()){
 			st.execute("DELETE FROM TB_CLIENTE");
 		} catch (final SQLException e) {
 			Vm.debug(e.getMessage());

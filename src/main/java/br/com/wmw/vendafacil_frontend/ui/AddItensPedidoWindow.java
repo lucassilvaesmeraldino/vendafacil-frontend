@@ -5,15 +5,15 @@ import java.util.List;
 import br.com.wmw.vendafacil_frontend.dao.ProdutoDao;
 import br.com.wmw.vendafacil_frontend.domain.Pedido;
 import br.com.wmw.vendafacil_frontend.domain.Produto;
+import br.com.wmw.vendafacil_frontend.service.PedidoService;
 import br.com.wmw.vendafacil_frontend.util.Colors;
 import br.com.wmw.vendafacil_frontend.util.Fonts;
 import br.com.wmw.vendafacil_frontend.util.Images;
 import br.com.wmw.vendafacil_frontend.util.MaterialConstants;
-import totalcross.sql.SQLException;
+import br.com.wmw.vendafacil_frontend.util.StringUtils;
+import br.com.wmw.vendafacil_frontend.util.Messages;
 import totalcross.sys.Settings;
-import totalcross.sys.Vm;
 import totalcross.ui.Button;
-import totalcross.ui.ClippedContainer;
 import totalcross.ui.Container;
 import totalcross.ui.ImageControl;
 import totalcross.ui.Label;
@@ -33,6 +33,8 @@ public class AddItensPedidoWindow extends Window{
 	private List<Produto> produtosList; 
 	private ProdutoDao produtoDao;
 	
+	private PedidoService pedidoService;
+	
 	private Container headContainer;
 	private Container footerContainer;
 		
@@ -48,6 +50,8 @@ public class AddItensPedidoWindow extends Window{
 		produtoDao = new ProdutoDao();
 		produtosList = produtoDao.findAll();
 		
+		pedidoService = new PedidoService();
+		
 		headContainer = new Container();
 		produtoScrollContainer = new ScrollContainer();
 		footerContainer = new Container();
@@ -62,7 +66,7 @@ public class AddItensPedidoWindow extends Window{
 		add(headContainer, LEFT+MaterialConstants.BORDER_SPACING, TOP+MaterialConstants.BORDER_SPACING, 
 				FILL-MaterialConstants.BORDER_SPACING, PARENTSIZE+13);
 		
-		ImageControl iconeSelecionar = new ImageControl(Images.iconeSelecionar);
+		ImageControl iconeSelecionar = new ImageControl(Images.getIconeSelecionar());
 		headContainer.add(iconeSelecionar, LEFT, TOP+3);
 		
 		Label titleLabel = new Label("Selecionar produtos");
@@ -71,11 +75,9 @@ public class AddItensPedidoWindow extends Window{
 		
 		add(produtoScrollContainer, LEFT+MaterialConstants.BORDER_SPACING+15, AFTER,
 				FILL-MaterialConstants.BORDER_SPACING-5, getScrollContainerSize());
-		try {
-			loadList();
-		} catch (SQLException e) {
-			Vm.debug(e.getMessage());
-		}
+		
+		loadListItens();
+
 		
 		add(footerContainer, LEFT+MaterialConstants.BORDER_SPACING, BOTTOM-MaterialConstants.BORDER_SPACING,
 				FILL-MaterialConstants.BORDER_SPACING,PARENTSIZE+13);
@@ -90,12 +92,12 @@ public class AddItensPedidoWindow extends Window{
 		return size;
 	}
 	
-	private void loadList() throws SQLException {
-		int index = 0;
+	private void loadListItens() {
+		int indexProduto = 0;
 		for(Produto produto : produtosList) {
 			String[] dadosProduto = produtoToArray(produto);
 			Container produtoContainer = new Container();
-			produtoContainer.appId = index++;
+			produtoContainer.appId = indexProduto++;
 			produtoContainer.setBorderStyle(BORDER_ROUNDED);
 			produtoContainer.borderColor = Colors.GRAY;
 			produtoScrollContainer.add(produtoContainer, LEFT, AFTER+10, produtoScrollContainer.getWidth()-10, 80);
@@ -111,9 +113,9 @@ public class AddItensPedidoWindow extends Window{
 	
 	private String[] produtoToArray(Produto produto) {
 		String[] produtoDadosArray = new String[3];
-		produtoDadosArray[0] = String.valueOf(produto.codigo);
-		produtoDadosArray[1] = String.valueOf(produto.preco); 
-		produtoDadosArray[2] = produto.nome.length() > 30 ? produto.nome.substring(0, 28).concat("...") : produto.nome;
+		produtoDadosArray[0] = String.valueOf(produto.getCodigo());
+		produtoDadosArray[1] = String.valueOf(produto.getPreco()); 
+		produtoDadosArray[2] = StringUtils.reduceLength(produto.getNome(), 30);
 		return produtoDadosArray;
 	}
 	
@@ -125,11 +127,11 @@ public class AddItensPedidoWindow extends Window{
 					CreatePedidoWindow createPedidoWindow = new CreatePedidoWindow(pedido, updating);
 					createPedidoWindow.popup();
 				} else if(event.target == btnProximo) {
-					if(validateItensPedido()) {
+					if(!pedidoService.hasEmptyItemList(pedido)) {
 						PedidoResumeWindow pedidoResumeWindow = new PedidoResumeWindow(pedido, updating);
 						pedidoResumeWindow.popup();
 					} else {
-						new MessageBox("Atenção!", "Adicione pelo menos um item ao pedido!").popup();
+						new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_PEDIDOINCORRECT_NOITEMS).popup();
 					}
 				}
 				break;
@@ -147,9 +149,5 @@ public class AddItensPedidoWindow extends Window{
 				break;
 		}
 		super.onEvent(event);
-	}
-	
-	private boolean validateItensPedido() {
-		return !pedido.itens.isEmpty();
 	}
 }

@@ -6,16 +6,19 @@ import totalcross.ui.image.Image;
 import totalcross.ui.image.ImageException;
 
 public class Images {
+	
+	private Images(){		
+	}
 
-	public static Image logoWMW;
-	public static Image iconeAdicionar;
-	public static Image iconeSelecionar;
-	public static Image iconeProcurar;
-	public static Image iconePessoa;
-	public static Image iconeEntrega;
-	public static Image iconeRemover;
-	public static Image iconeListagem;
-	public static Image iconeEditar;
+	private static Image logoWMW;
+	private static Image iconeAdicionar;
+	private static Image iconeSelecionar;
+	private static Image iconeProcurar;
+	private static Image iconePessoa;
+	private static Image iconeEntrega;
+	private static Image iconeRemover;
+	private static Image iconeListagem;
+	private static Image iconeEditar;
 
 	public static void loadImages() {
 		try {
@@ -28,10 +31,45 @@ public class Images {
 			iconeRemover = new Image("images/icone-remover.png");
 			iconeListagem = new Image("images/icone-listagem.png");
 			iconeEditar = new Image("images/icone-editar.png");
-		} catch (final ImageException ex) {
-			Vm.debug(ex.getMessage());
-		} catch (final IOException ex) {
+		} catch (final ImageException | IOException ex) {
 			Vm.debug(ex.getMessage());
 		}
 	}
+
+	public static Image getLogoWMW() {
+		return logoWMW;
+	}
+
+	public static Image getIconeAdicionar() {
+		return iconeAdicionar;
+	}
+
+	public static Image getIconeSelecionar() {
+		return iconeSelecionar;
+	}
+
+	public static Image getIconeProcurar() {
+		return iconeProcurar;
+	}
+
+	public static Image getIconePessoa() {
+		return iconePessoa;
+	}
+
+	public static Image getIconeEntrega() {
+		return iconeEntrega;
+	}
+
+	public static Image getIconeRemover() {
+		return iconeRemover;
+	}
+
+	public static Image getIconeListagem() {
+		return iconeListagem;
+	}
+
+	public static Image getIconeEditar() {
+		return iconeEditar;
+	}
+	
 }

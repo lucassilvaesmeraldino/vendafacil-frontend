@@ -20,17 +20,17 @@ public class PedidoDao {
 		try {
 			PreparedStatement ps = DatabaseManager.getConnection().
 					prepareStatement("INSERT INTO TB_PEDIDO (DATA_EMISSAO, DATA_ENTREGA, CD_CLIENTE, CD_STATUSPEDIDO, TOTAL_PEDIDO) VALUES (?,?,?,?,?)");
-			ps.setString(1, pedido.dataEmissao);
-			ps.setString(2, pedido.dataEntrega);
-			ps.setLong(3, pedido.codigoCliente);
-			ps.setLong(4, pedido.statusPedido.ordinal());
-			ps.setDouble(5, pedido.totalPedido);
+			ps.setString(1, pedido.getDataEmissao());
+			ps.setString(2, pedido.getDataEntrega());
+			ps.setLong(3, pedido.getCodigoCliente());
+			ps.setLong(4, pedido.getStatusPedido().ordinal());
+			ps.setDouble(5, pedido.getTotalPedido());
 					
 			int affectedRows = ps.executeUpdate();
 			if(affectedRows == 0) throw new PersistenceException("Erro ao inserir o pedido.");
 			ps.close();
 			
-			boolean inserted = new ItemPedidoDao().insertItensByPedido(pedido.itens, getLastInsertedId());
+			boolean inserted = new ItemPedidoDao().insertItensByPedido(pedido.getItens(), getLastInsertedId());
 			if(!inserted) throw new PersistenceException("Erro ao inserir itens do pedido.");
 			
 		} catch (SQLException e) {
@@ -43,17 +43,17 @@ public class PedidoDao {
 		try {
 			PreparedStatement ps = DatabaseManager.getConnection().
 					prepareStatement("UPDATE TB_PEDIDO SET DATA_ENTREGA = ?, CD_CLIENTE = ?, CD_STATUSPEDIDO = ?, TOTAL_PEDIDO = ? WHERE CD_PEDIDO = ?");
-			ps.setString(1, pedido.dataEntrega);
-			ps.setLong(2, pedido.codigoCliente);
-			ps.setLong(3, pedido.statusPedido.ordinal());
-			ps.setDouble(4, pedido.totalPedido);
-			ps.setDouble(5, pedido.codigoPedido);
+			ps.setString(1, pedido.getDataEntrega());
+			ps.setLong(2, pedido.getCodigoCliente());
+			ps.setLong(3, pedido.getStatusPedido().ordinal());
+			ps.setDouble(4, pedido.getTotalPedido());
+			ps.setDouble(5, pedido.getCodigoPedido());
 					
 			int affectedRows = ps.executeUpdate();
 			if(affectedRows == 0) throw new PersistenceException("Erro ao atualizar o pedido.");
 			ps.close();
 			
-			boolean updated = new ItemPedidoDao().updateItensByPedido(pedido.itens, pedido.codigoPedido);
+			boolean updated = new ItemPedidoDao().updateItensByPedido(pedido.getItens(), pedido.getCodigoPedido());
 			if(!updated) throw new PersistenceException("Erro ao atualizar itens do pedido.");
 			
 		} catch(SQLException e) {
@@ -63,22 +63,20 @@ public class PedidoDao {
 	
 	public List<Pedido> findAll() {
 		List<Pedido> pedidosList = new ArrayList<>();
-		try {
-			Statement st = DatabaseManager.getConnection().createStatement();
+		try(Statement st = DatabaseManager.getConnection().createStatement()) {
 			ResultSet rs = st.executeQuery("SELECT CD_PEDIDO, CD_CLIENTE, CD_STATUSPEDIDO, DATA_ENTREGA, DATA_EMISSAO, TOTAL_PEDIDO"
 					+ " FROM TB_PEDIDO");
 			while(rs.next()) {
 				Pedido pedido = new Pedido();
-				pedido.codigoPedido = rs.getInt("CD_PEDIDO");
-				pedido.codigoCliente = rs.getInt("CD_CLIENTE");
-				pedido.statusPedido = StatusPedido.getByCodigo(rs.getInt("CD_STATUSPEDIDO"));
-				pedido.dataEntrega = rs.getString("DATA_ENTREGA");
-				pedido.dataEntrega = rs.getString("DATA_ENTREGA");
-				pedido.dataEmissao = rs.getString("DATA_EMISSAO");
-				pedido.totalPedido = rs.getDouble("TOTAL_PEDIDO");
+				pedido.setCodigoPedido(rs.getInt("CD_PEDIDO"));
+				pedido.setCodigoCliente(rs.getLong("CD_CLIENTE"));
+				pedido.setStatusPedido(StatusPedido.getByCodigo(rs.getInt("CD_STATUSPEDIDO")));
+				pedido.setDataEntrega(rs.getString("DATA_ENTREGA"));
+				pedido.setDataEmissao(rs.getString("DATA_EMISSAO"));
+				pedido.setTotalPedido(rs.getDouble("TOTAL_PEDIDO"));
 				
-				List<ItemPedido> itensPedido = new ItemPedidoDao().findByCodigoPedido(pedido.codigoPedido);
-				pedido.itens = itensPedido;
+				List<ItemPedido> itensPedido = new ItemPedidoDao().findByCodigoPedido(pedido.getCodigoPedido());
+				pedido.setItens(itensPedido);
 				
 				pedidosList.add(pedido);
 			}
@@ -91,22 +89,20 @@ public class PedidoDao {
 	
 	public List<Pedido> findAllByStatus(StatusPedido statusPedido) {
 		List<Pedido> pedidosList = new ArrayList<>();
-		try {
-			Statement st = DatabaseManager.getConnection().createStatement();
+		try(Statement st = DatabaseManager.getConnection().createStatement()) {
 			ResultSet rs = st.executeQuery("SELECT CD_PEDIDO, CD_CLIENTE, CD_STATUSPEDIDO, DATA_ENTREGA, DATA_EMISSAO, TOTAL_PEDIDO"
 					+ " FROM TB_PEDIDO WHERE CD_STATUSPEDIDO = " + statusPedido.ordinal());
 			while(rs.next()) {
 				Pedido pedido = new Pedido();
-				pedido.codigoPedido = rs.getInt("CD_PEDIDO");
-				pedido.codigoCliente = rs.getInt("CD_CLIENTE");
-				pedido.statusPedido = StatusPedido.getByCodigo(rs.getInt("CD_STATUSPEDIDO"));
-				pedido.dataEntrega = rs.getString("DATA_ENTREGA");
-				pedido.dataEntrega = rs.getString("DATA_ENTREGA");
-				pedido.dataEmissao = rs.getString("DATA_EMISSAO");
-				pedido.totalPedido = rs.getDouble("TOTAL_PEDIDO");
+				pedido.setCodigoPedido(rs.getInt("CD_PEDIDO"));
+				pedido.setCodigoCliente(rs.getLong("CD_CLIENTE"));
+				pedido.setStatusPedido(StatusPedido.getByCodigo(rs.getInt("CD_STATUSPEDIDO")));
+				pedido.setDataEntrega(rs.getString("DATA_ENTREGA"));
+				pedido.setDataEmissao(rs.getString("DATA_EMISSAO"));
+				pedido.setTotalPedido(rs.getDouble("TOTAL_PEDIDO"));
 				
-				List<ItemPedido> itensPedido = new ItemPedidoDao().findByCodigoPedido(pedido.codigoPedido);
-				pedido.itens = itensPedido;
+				List<ItemPedido> itensPedido = new ItemPedidoDao().findByCodigoPedido(pedido.getCodigoPedido());
+				pedido.setItens(itensPedido);
 				
 				pedidosList.add(pedido);
 			}
@@ -117,12 +113,16 @@ public class PedidoDao {
 		
 	}
 	
-	private int getLastInsertedId() throws SQLException {
-		Statement st = DatabaseManager.getConnection().createStatement();
-		ResultSet rs = st.executeQuery("SELECT MAX(CD_PEDIDO) AS MAX_CDPEDIDO FROM TB_PEDIDO");
-		int lastIdInserted = rs.getInt("MAX_CDPEDIDO");
-		rs.close();
-		st.close();
+	private Integer getLastInsertedId() {
+		int lastIdInserted = 0;
+		try(Statement st = DatabaseManager.getConnection().createStatement()){
+			ResultSet rs = st.executeQuery("SELECT MAX(CD_PEDIDO) AS MAX_CDPEDIDO FROM TB_PEDIDO");
+			lastIdInserted = rs.getInt("MAX_CDPEDIDO");
+			rs.close();
+		} catch (SQLException e) {
+			Vm.debug(e.getMessage());
+		}
+
 		return lastIdInserted;
 	}
 }
