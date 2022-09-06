@@ -20,23 +20,23 @@ public class DateUtilsTest extends TestCase{
 		assertEquals(DATE_DMY, strDate);
 	}
 	
-	public void shouldRetornTrueWhenDateIsTheSameAsTheCurrentDate() {
+	public void shouldReturnTrueWhenDateIsTheSameAsTheCurrentDate() {
 		assertTrue(DateUtils.isPresentOrFutureDate(DATE_DMY, Settings.DATE_DMY));
 	}
 	
-	public void shouldRetornTrueWhenDateIsLaterThanTheCurrentDate() {
+	public void shouldReturnTrueWhenDateIsLaterThanTheCurrentDate() {
 		assertTrue(DateUtils.isPresentOrFutureDate(DATE_DMY_LATER, Settings.DATE_DMY));
 	}
 	
-	public void shouldRetornFalseWhenDateIsBeforeTheCurrentDate() {
+	public void shouldReturnFalseWhenDateIsBeforeTheCurrentDate() {
 		assertTrue(!DateUtils.isPresentOrFutureDate(DATE_DMY_BEFORE, Settings.DATE_DMY));
 	}
 
 	@Override
 	public void testRun() {
 		shouldConvertStringDateToDate();
-		shouldRetornTrueWhenDateIsTheSameAsTheCurrentDate();
-		shouldRetornTrueWhenDateIsLaterThanTheCurrentDate();
-		shouldRetornFalseWhenDateIsBeforeTheCurrentDate();
+		shouldReturnTrueWhenDateIsTheSameAsTheCurrentDate();
+		shouldReturnTrueWhenDateIsLaterThanTheCurrentDate();
+		shouldReturnFalseWhenDateIsBeforeTheCurrentDate();
 	}
 }
