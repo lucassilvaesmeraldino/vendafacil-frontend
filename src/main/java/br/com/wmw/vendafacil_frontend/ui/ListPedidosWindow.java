@@ -1,16 +1,22 @@
 package br.com.wmw.vendafacil_frontend.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import br.com.wmw.vendafacil_frontend.api.PedidoApi;
 import br.com.wmw.vendafacil_frontend.dao.ClienteDao;
 import br.com.wmw.vendafacil_frontend.dao.PedidoDao;
 import br.com.wmw.vendafacil_frontend.domain.Pedido;
 import br.com.wmw.vendafacil_frontend.domain.StatusPedido;
+import br.com.wmw.vendafacil_frontend.exception.ConnectionException;
+import br.com.wmw.vendafacil_frontend.exception.FailedToSendException;
+import br.com.wmw.vendafacil_frontend.exception.PersistenceException;
 import br.com.wmw.vendafacil_frontend.service.PedidoService;
 import br.com.wmw.vendafacil_frontend.util.Colors;
 import br.com.wmw.vendafacil_frontend.util.Fonts;
 import br.com.wmw.vendafacil_frontend.util.Images;
 import br.com.wmw.vendafacil_frontend.util.MaterialConstants;
+import br.com.wmw.vendafacil_frontend.util.Messages;
 import totalcross.sys.Settings;
 import totalcross.ui.Button;
 import totalcross.ui.Container;
@@ -19,6 +25,7 @@ import totalcross.ui.ImageControl;
 import totalcross.ui.Label;
 import totalcross.ui.ScrollContainer;
 import totalcross.ui.Window;
+import totalcross.ui.dialog.MessageBox;
 import totalcross.ui.event.ControlEvent;
 import totalcross.ui.event.Event;
 import totalcross.ui.event.EventHandler;
@@ -38,6 +45,7 @@ public class ListPedidosWindow extends Window {
 
 	private final Button btnIncluirPedido;
 	private final Button btnVoltar;
+	private final Button btnSincronizar;
 
 	public ListPedidosWindow() {
 		pedidoDao = new PedidoDao();
@@ -48,9 +56,11 @@ public class ListPedidosWindow extends Window {
 		headContainer = new Container();
 		footerContainer = new Container();
 		
-		this.btnIncluirPedido = new Button("Novo Pedido");
+		btnIncluirPedido = new Button("Novo Pedido");
 		btnIncluirPedido.setBackForeColors(Colors.BLUE, Colors.WHITE);
 		btnVoltar = new Button("Voltar");
+		btnSincronizar = new Button(Images.getIconeSincronizar());
+		btnSincronizar.addPressListener(event -> sendPedidosToBackend());
 	}
 
 	@Override
@@ -63,11 +73,13 @@ public class ListPedidosWindow extends Window {
 				FILL-MaterialConstants.BORDER_SPACING, PARENTSIZE+10);
 		
 		ImageControl iconeListagem = new ImageControl(Images.getIconeListagem());
-		headContainer.add(iconeListagem, LEFT, TOP+2);
+		headContainer.add(iconeListagem, LEFT, TOP+5);
 		
 		Label titleLabel = new Label("Pedidos criados");
 		titleLabel.setFont(Fonts.latoBoldPlus12);
-		headContainer.add(titleLabel, AFTER+MaterialConstants.COMPONENT_SPACING, TOP);
+		headContainer.add(titleLabel, AFTER+MaterialConstants.COMPONENT_SPACING, TOP+3);
+		
+		headContainer.add(btnSincronizar, RIGHT, TOP, 40, PARENTSIZE+65);
 		
 		add(pedidoScrollContainer, LEFT+MaterialConstants.COMPONENT_SPACING+10, AFTER+MaterialConstants.BORDER_SPACING, FILL
 				-MaterialConstants.COMPONENT_SPACING, getScrollContainerSize());
@@ -113,6 +125,19 @@ public class ListPedidosWindow extends Window {
 		return labelColor;
 				
 	}
+	
+	private void sendPedidosToBackend() {
+		List<Pedido> closedPedidos = new ArrayList<>();
+		pedidosList.forEach(p -> {
+			if(p.getStatusPedido() == StatusPedido.FECHADO) closedPedidos.add(p);
+		});
+		try {
+			PedidoApi.sendPedidos(closedPedidos);
+		} catch (FailedToSendException|PersistenceException|ConnectionException e) {
+			new MessageBox(Messages.TYPE_ERROR, e.getMessage()).popup();
+		}
+		reloadPedidosList();
+	}
 
 	@Override
 	public <H extends EventHandler> void onEvent(final Event<H> event) {
@@ -144,5 +169,12 @@ public class ListPedidosWindow extends Window {
 			break;
 		}
 		super.onEvent(event);
+	}
+	
+	private void reloadPedidosList() {
+		pedidoScrollContainer = new ScrollContainer();
+		removeAll();
+		constructScreen();
+		reposition();
 	}
 }

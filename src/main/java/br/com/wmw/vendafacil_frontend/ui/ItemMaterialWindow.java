@@ -8,8 +8,8 @@ import br.com.wmw.vendafacil_frontend.util.Colors;
 import br.com.wmw.vendafacil_frontend.util.DoubleUtils;
 import br.com.wmw.vendafacil_frontend.util.Fonts;
 import br.com.wmw.vendafacil_frontend.util.MaterialConstants;
-import br.com.wmw.vendafacil_frontend.util.StringUtils;
 import br.com.wmw.vendafacil_frontend.util.Messages;
+import br.com.wmw.vendafacil_frontend.util.StringUtils;
 import totalcross.ui.Button;
 import totalcross.ui.Container;
 import totalcross.ui.Edit;
@@ -107,8 +107,13 @@ public class ItemMaterialWindow extends MaterialWindow {
 
 			private boolean validateFields() {
 				String desconto = editDesconto.getText().replace(",", ".");
-				if (editQuantidade.getText().isEmpty()) {
+				String quantidade = editQuantidade.getText();
+				if (quantidade.isEmpty()) {
 					new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DESCONTOINCORRECT_EMPTY).popup();
+					return false;
+				}
+				if(Double.valueOf(quantidade).equals(Double.valueOf(0))) {
+					new MessageBox(Messages.TYPE_WARNING, Messages.MESSAGE_DESCONTOINCORRECT_ZERO).popup();
 					return false;
 				}
 				if (editDesconto.getText().isEmpty()) {

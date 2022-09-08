@@ -19,6 +19,7 @@ public class Images {
 	private static Image iconeRemover;
 	private static Image iconeListagem;
 	private static Image iconeEditar;
+	private static Image iconeSincronizar;
 
 	public static void loadImages() {
 		try {
@@ -31,6 +32,7 @@ public class Images {
 			iconeRemover = new Image("images/icone-remover.png");
 			iconeListagem = new Image("images/icone-listagem.png");
 			iconeEditar = new Image("images/icone-editar.png");
+			iconeSincronizar = new Image("images/icone-sincronizar.png");
 		} catch (final ImageException | IOException ex) {
 			Vm.debug(ex.getMessage());
 		}
@@ -71,5 +73,9 @@ public class Images {
 	public static Image getIconeEditar() {
 		return iconeEditar;
 	}
-	
+
+	public static Image getIconeSincronizar() {
+		return iconeSincronizar;
+	}
+
 }

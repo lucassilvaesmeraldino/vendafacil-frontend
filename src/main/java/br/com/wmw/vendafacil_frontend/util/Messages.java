@@ -17,6 +17,7 @@ public class Messages {
 	public static final String MESSAGE_DATEINCORRECT_LENGTH = "Digite uma data válida!";
 	public static final String MESSAGE_CLIENTINCORRECT_EMPTY = "Selecione um cliente!";
 	public static final String MESSAGE_QUANTIDADEINCORRECT_EMPTY = "Digite uma quantidade!";
+	public static final String MESSAGE_DESCONTOINCORRECT_ZERO = "Digite uma quantidade válida!";
 	public static final String MESSAGE_DESCONTOINCORRECT_EMPTY = "Digite um desconto!";
 	public static final String MESSAGE_DESCONTOINCORRECT_INVALID = "Digite um desconto válido!";
 	public static final String MESSAGE_PEDIDOINCORRECT_NOITEMS = "O pedido precisa ter no mínimo um item atríbuido à ele!";
